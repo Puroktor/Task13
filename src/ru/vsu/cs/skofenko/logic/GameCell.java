@@ -2,12 +2,12 @@ package ru.vsu.cs.skofenko.logic;
 
 import java.util.Random;
 
-public class GameCell{
+public class GameCell {
     private int value;
     private boolean empty;
 
-    public void makeEmpty(){
-        empty=true;
+    public void makeEmpty() {
+        empty = true;
     }
 
     public boolean isEmpty() {
@@ -17,31 +17,32 @@ public class GameCell{
     public int getValue() {
         return value;
     }
-    public void increaseValue(){
-        value*=2;
+
+    public void increaseValue() {
+        value *= 2;
     }
 
-    public GameCell(){
-        empty=true;
+    public GameCell() {
+        empty = true;
     }
 
-    public void fillCell(Random random){
-        int tmp= random.nextInt(10);
-        if(tmp==9){
-            value=4;
+    public void fillCell(Random random) {
+        int tmp = random.nextInt(10);
+        if (tmp == 9) {
+            value = 4;
         } else {
-            value=2;
+            value = 2;
         }
-        empty=false;
+        empty = false;
     }
 
     public void swapWith(GameCell gameCell) {
-        int temp= gameCell.value;
-        gameCell.value=value;
-        value=temp;
+        int temp = gameCell.value;
+        gameCell.value = value;
+        value = temp;
 
-        boolean temp2=gameCell.empty;
-        gameCell.empty=empty;
-        empty=temp2;
+        boolean temp2 = gameCell.empty;
+        gameCell.empty = empty;
+        empty = temp2;
     }
 }

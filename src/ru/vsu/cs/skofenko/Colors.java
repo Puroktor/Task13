@@ -3,7 +3,7 @@ package ru.vsu.cs.skofenko;
 import java.awt.*;
 
 public class Colors {
-    public static final Color EMPTYCOLOR = new Color(255,255,255);
+    public static final Color EMPTYCOLOR = new Color(255, 255, 255);
 
     public static final Color COLOR2 = new Color(200, 200, 200);
 

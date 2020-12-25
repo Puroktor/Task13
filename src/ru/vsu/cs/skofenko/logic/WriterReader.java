@@ -6,19 +6,18 @@ import java.util.Scanner;
 
 public class WriterReader {
 
-    public static void writeBestScore(String score){
-        try(PrintWriter pw = new PrintWriter("bestScore.txt")){
+    public static void writeBestScore(String score) {
+        try (PrintWriter pw = new PrintWriter("bestScore.txt")) {
             pw.println(score);
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored){}
     }
 
-    public static int readBestScore(){
+    public static int readBestScore() {
         try {
-            Scanner scanner =new Scanner(new File("bestScore.txt"));
+            Scanner scanner = new Scanner(new File("bestScore.txt"));
             return scanner.nextInt();
-        }
-        catch (Exception exception){
+        } catch (Exception exception) {
             return 0;
         }
     }
