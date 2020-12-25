@@ -71,28 +71,28 @@ public class GameLogic {
 
     public boolean shift(Direction dir) {
         boolean madeMove = switch (dir) {
-            case UP -> shiftUp(true);
-            case DOWN -> shiftDown(true);
-            case LEFT -> shiftLeft(true);
-            case RIGHT -> shiftRight(true);
+            case UP -> shiftVertically(true,true);
+            case DOWN -> shiftVertically(true,false);
+            case LEFT -> shiftHorizontally(true,true);
+            case RIGHT -> shiftHorizontally(true,false);
         };
         if (madeMove)
             createCell();
-        if (gameState == GameState.PLAYING && !shiftLeft(false) && !shiftRight(false)
-                && !shiftDown(false) && !shiftUp(false)) {
+        if (gameState == GameState.PLAYING && !shiftHorizontally(false,true) && !shiftHorizontally(false,false)
+                && !shiftVertically(false,true) && !shiftVertically(false,true)) {
             gameState = GameState.LOSE;
         }
         return madeMove;
     }
 
-    private boolean shiftLeft(boolean needChange) {
+    private boolean shiftHorizontally(boolean needChange, boolean toLeft) {
         boolean madeMove = false;
         for (int i = 0; i < rowCount; i++) {
-            for (int j = 0; j < columnCount; j++) {
+            for (int j = (toLeft)?0:columnCount - 1;(toLeft)?j < columnCount:j >= 0;j+=boolToInt(toLeft)) {
                 if (!field[i][j].isEmpty()) {
                     boolean swapped = false;
                     int swapWithIndex = -1;
-                    for (int z = j - 1; z >= 0; z--) {
+                    for (int z = (toLeft)?j - 1:j + 1; (toLeft)?z >= 0:z < columnCount; z-=boolToInt(toLeft)) {
                         if (field[i][z].isEmpty()) {
                             swapWithIndex = z;
                         } else {
@@ -127,56 +127,14 @@ public class GameLogic {
         return madeMove;
     }
 
-    private boolean shiftRight(boolean needChange) {
-        boolean madeMove = false;
-        for (int i = 0; i < rowCount; i++) {
-            for (int j = columnCount - 1; j >= 0; j--) {
-                if (!field[i][j].isEmpty()) {
-                    boolean swapped = false;
-                    int swapWithIndex = -1;
-                    for (int z = j + 1; z < columnCount; z++) {
-                        if (field[i][z].isEmpty()) {
-                            swapWithIndex = z;
-                        } else {
-                            if (field[i][z].getValue() == field[i][j].getValue()) {
-                                if (needChange) {
-                                    field[i][z].increaseValue();
-                                    if (field[i][z].getValue() == 2048) {
-                                        gameState = GameState.WIN;
-                                    }
-                                    score += field[i][z].getValue();
-                                    field[i][j].makeEmpty();
-                                    filledCells--;
-                                    swapped = true;
-                                } else
-                                    return true;
-                            }
-                            break;
-                        }
-                    }
-                    if (!swapped && swapWithIndex != -1) {
-                        if (needChange) {
-                            field[i][j].swapWith(field[i][swapWithIndex]);
-                            swapped = true;
-                        } else
-                            return true;
-                    }
-
-                    madeMove = madeMove || swapped;
-                }
-            }
-        }
-        return madeMove;
-    }
-
-    private boolean shiftUp(boolean needChange) {
+    private boolean shiftVertically(boolean needChange, boolean toTop) {
         boolean madeMove = false;
         for (int j = 0; j < columnCount; j++) {
-            for (int i = 0; i < rowCount; i++) {
+            for (int i = (toTop)?0:rowCount - 1; (toTop)?i < rowCount:i >= 0; i+=boolToInt(toTop)) {
                 if (!field[i][j].isEmpty()) {
                     boolean swapped = false;
                     int swapWithIndex = -1;
-                    for (int z = i - 1; z >= 0; z--) {
+                    for (int z = (toTop)?i - 1:i + 1;(toTop)?z >= 0:z < rowCount; z-=boolToInt(toTop)) {
                         if (field[z][j].isEmpty()) {
                             swapWithIndex = z;
                         } else {
@@ -211,45 +169,7 @@ public class GameLogic {
         return madeMove;
     }
 
-    private boolean shiftDown(boolean needChange) {
-        boolean madeMove = false;
-        for (int j = 0; j < columnCount; j++) {
-            for (int i = rowCount - 1; i >= 0; i--) {
-                if (!field[i][j].isEmpty()) {
-                    boolean swapped = false;
-                    int swapWithIndex = -1;
-                    for (int z = i + 1; z < rowCount; z++) {
-                        if (field[z][j].isEmpty()) {
-                            swapWithIndex = z;
-                        } else {
-                            if (field[z][j].getValue() == field[i][j].getValue()) {
-                                if (needChange) {
-                                    field[z][j].increaseValue();
-                                    if (field[z][j].getValue() == 2048) {
-                                        gameState = GameState.WIN;
-                                    }
-                                    score += field[z][j].getValue();
-                                    field[i][j].makeEmpty();
-                                    filledCells--;
-                                    swapped = true;
-                                } else
-                                    return true;
-                            }
-                            break;
-                        }
-                    }
-                    if (!swapped && swapWithIndex != -1) {
-                        if (needChange) {
-                            field[i][j].swapWith(field[swapWithIndex][j]);
-                            swapped = true;
-                        } else
-                            return true;
-                    }
-
-                    madeMove = madeMove || swapped;
-                }
-            }
-        }
-        return madeMove;
+    public int boolToInt(boolean b) {
+        return b ? 1 : -1;
     }
 }
