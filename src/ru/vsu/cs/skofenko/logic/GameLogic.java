@@ -70,40 +70,37 @@ public class GameLogic {
     }
 
     public boolean shift(Direction dir) {
-        boolean madeMove = switch (dir) {
-            case UP -> shiftVertically(true,true);
-            case DOWN -> shiftVertically(true,false);
-            case LEFT -> shiftHorizontally(true,true);
-            case RIGHT -> shiftHorizontally(true,false);
-        };
+        boolean madeMove = shift(dir,true);
         if (madeMove)
             createCell();
-        if (gameState == GameState.PLAYING && !shiftHorizontally(false,true) && !shiftHorizontally(false,false)
-                && !shiftVertically(false,true) && !shiftVertically(false,true)) {
+        if (gameState == GameState.PLAYING && !shift(Direction.DOWN,false) && !shift(Direction.UP,false)
+                && !shift(Direction.RIGHT,false) && !shift(Direction.LEFT,false)) {
             gameState = GameState.LOSE;
         }
         return madeMove;
     }
 
-    private boolean shiftHorizontally(boolean needChange, boolean toLeft) {
+    private boolean shift(Direction dir, boolean needChange){
         boolean madeMove = false;
+        FieldRotator rotator = new FieldRotator(field,rowCount,columnCount,dir);
         for (int i = 0; i < rowCount; i++) {
-            for (int j = (toLeft)?0:columnCount - 1;(toLeft)?j < columnCount:j >= 0;j+=boolToInt(toLeft)) {
-                if (!field[i][j].isEmpty()) {
+            boolean previousNotIncreased=true;
+            for (int j = 0; j < columnCount; j++) {
+                if (!rotator.getCell(i,j).isEmpty()) {
                     boolean swapped = false;
                     int swapWithIndex = -1;
-                    for (int z = (toLeft)?j - 1:j + 1; (toLeft)?z >= 0:z < columnCount; z-=boolToInt(toLeft)) {
-                        if (field[i][z].isEmpty()) {
+                    for (int z = j - 1; z >= 0; z--) {
+                        if (rotator.getCell(i,z).isEmpty()) {
                             swapWithIndex = z;
                         } else {
-                            if (field[i][z].getValue() == field[i][j].getValue()) {
+                            if (previousNotIncreased && rotator.getCell(i,z).getValue() == rotator.getCell(i,j).getValue()) {
                                 if (needChange) {
-                                    field[i][z].increaseValue();
-                                    if (field[i][z].getValue() == 2048) {
+                                    rotator.getCell(i,z).increaseValue();
+                                    if (rotator.getCell(i,z).getValue() == 2048) {
                                         gameState = GameState.WIN;
                                     }
-                                    score += field[i][z].getValue();
-                                    field[i][j].makeEmpty();
+                                    score += rotator.getCell(i,z).getValue();
+                                    rotator.getCell(i,j).makeEmpty();
                                     filledCells--;
                                     swapped = true;
                                 } else
@@ -112,64 +109,18 @@ public class GameLogic {
                             break;
                         }
                     }
+                    previousNotIncreased= !swapped;
                     if (!swapped && swapWithIndex != -1) {
                         if (needChange) {
-                            field[i][j].swapWith(field[i][swapWithIndex]);
+                            rotator.getCell(i,j).swapWith(rotator.getCell(i,swapWithIndex));
                             swapped = true;
                         } else
                             return true;
                     }
-
                     madeMove = madeMove || swapped;
                 }
             }
         }
         return madeMove;
-    }
-
-    private boolean shiftVertically(boolean needChange, boolean toTop) {
-        boolean madeMove = false;
-        for (int j = 0; j < columnCount; j++) {
-            for (int i = (toTop)?0:rowCount - 1; (toTop)?i < rowCount:i >= 0; i+=boolToInt(toTop)) {
-                if (!field[i][j].isEmpty()) {
-                    boolean swapped = false;
-                    int swapWithIndex = -1;
-                    for (int z = (toTop)?i - 1:i + 1;(toTop)?z >= 0:z < rowCount; z-=boolToInt(toTop)) {
-                        if (field[z][j].isEmpty()) {
-                            swapWithIndex = z;
-                        } else {
-                            if (field[z][j].getValue() == field[i][j].getValue()) {
-                                if (needChange) {
-                                    field[z][j].increaseValue();
-                                    if (field[z][j].getValue() == 2048) {
-                                        gameState = GameState.WIN;
-                                    }
-                                    score += field[z][j].getValue();
-                                    field[i][j].makeEmpty();
-                                    filledCells--;
-                                    swapped = true;
-                                } else
-                                    return true;
-                            }
-                            break;
-                        }
-                    }
-                    if (!swapped && swapWithIndex != -1) {
-                        if (needChange) {
-                            field[i][j].swapWith(field[swapWithIndex][j]);
-                            swapped = true;
-                        } else
-                            return true;
-                    }
-
-                    madeMove = madeMove || swapped;
-                }
-            }
-        }
-        return madeMove;
-    }
-
-    public int boolToInt(boolean b) {
-        return b ? 1 : -1;
     }
 }

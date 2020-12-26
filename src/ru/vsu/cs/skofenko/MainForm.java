@@ -99,7 +99,7 @@ public class MainForm extends JFrame {
 
         mainPanel.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyPressed(KeyEvent e) {
+            public void keyReleased(KeyEvent e) {
                 if (logic.getGameState() == GameState.PLAYING) {
                     boolean needToUpdate = false;
                     switch (e.getKeyCode()) {
@@ -166,7 +166,6 @@ public class MainForm extends JFrame {
             }
             str = String.valueOf(cell.getValue());
         }
-
         int bound = (int) Math.round(size * 0.1);
         g2d.setColor(backColor);
         g2d.fillRect(0, 0, width, height);
